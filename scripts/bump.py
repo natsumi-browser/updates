@@ -14,7 +14,6 @@ except:
     raise
 
 version = version_data['version']
-tag = version_data['tag']
 branch = version_data['branch']
 
 # Run version check
@@ -33,7 +32,7 @@ else:
         sys.exit(1)
 
 # Get archive hash
-exit_code = os.system(f"wget -O natsumi-browser/archive.zip https://github.com/greeeen-dev/natsumi-browser/archive/refs/tags/{tag}.zip")
+exit_code = os.system(f"wget -O natsumi-browser/archive.zip https://github.com/greeeen-dev/natsumi-browser/archive/refs/tags/v{version}.zip")
 if exit_code != 0:
     print("Failed to download archive.")
     sys.exit(1)
