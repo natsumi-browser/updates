@@ -1,6 +1,8 @@
 import time
 import json
 import sys
+import os
+import hashlib
 
 # Read version data
 try:
@@ -12,14 +14,8 @@ except:
     raise
 
 version = version_data['version']
+tag = version_data['tag']
 branch = version_data['branch']
-
-# Template data
-template_data = {
-    "version": version,
-    "tag": f"v{version}",
-    "releasedAt": round(time.time())
-}
 
 # Run version check
 # If versions are identical, this check should fail
@@ -35,6 +31,24 @@ else:
     if existing_data.get("version") == version:
         print("Versions are identical, cannot publish.")
         sys.exit(1)
+
+# Get archive hash
+exit_code = os.system(f"wget -O natsumi-browser/archive.zip https://github.com/greeeen-dev/natsumi-browser/archive/refs/tags/{tag}.zip")
+if exit_code != 0:
+    print("Failed to download archive.")
+    sys.exit(1)
+
+with open("natsumi-browser/archive.zip", "rb") as file:
+    sha256 = hashlib.sha256()
+    sha256.update(file.read())
+
+# Template data
+template_data = {
+    "version": version,
+    "tag": f"v{version}",
+    "hash": sha256.hexdigest(),
+    "releasedAt": round(time.time())
+}
 
 # Write new data
 with open(f"{branch}.json", 'w+') as file:
